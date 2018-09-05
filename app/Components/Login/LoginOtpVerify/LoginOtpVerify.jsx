@@ -11,6 +11,45 @@ import {
     Field, reduxForm, formValueSelector,
 } from 'redux-form';
 import history from '../../../history';
+import axios from 'axios';
+
+export const validate = (values) => {
+    const error = {};
+    /* eslint max-len: ["error", { "ignoreRegExpLiterals": true }] */
+    // const emailPattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    // const emailPasswordPattern = /^[a-zA-Z0-9]{8,16}$/g;
+    // const validEmail = emailPattern.test(values.email);
+    // eslint-disable-next-line
+    // const validPwd = emailPasswordPattern.test(values.password);
+
+    if (!values.comPhoneText1) {
+        error.comPhoneText1 = 'Required';}
+        if (!values.comPhoneText2) {
+            error.comPhoneText1 = 'Required';}
+        if (!values.comPhoneText3) {
+            error.comPhoneText1 = 'Required';}
+            if (!values.comPhoneText4) {
+                error.comPhoneText1 = 'Required';}
+                if (!values.comPhoneText5) {
+                    error.comPhoneText1 = 'Required';}
+                    if (!values.comPhoneText6) {
+                        error.comPhoneText1 = 'Required';}
+                  
+        // if (!values.comPhoneText2) {
+        //     error.comPhoneText2 = 'Required';}
+    // } else if (!validEmail) {
+    //     error.email = 'Please Enter a Valid Email';
+    // }
+
+    // if (!values.password) {
+    //     error.password = 'Required';
+    // } else if (values.password.length < 8) {
+    //     error.password = 'Password should be greater than 8';
+    // } else if (values.password.length > 15) {
+    //     error.password = 'Password should be lesser than 16';
+    // }
+    return error;
+};
 
 export const normalizeZip = (value) => {
     if (!value) {
@@ -73,8 +112,18 @@ export class LoginOtpVerify extends React.Component {
         super();
         this.state = {
             // recaptchaVerified: false,
+            otpNumber:'',
+            otpError:false
         };
     }
+
+    componentDidMount() {
+        axios.get(`http://localhost:8080/data.json`)
+          .then(res => {
+            const otpNumber = res.data && res.data.otpNumber;
+            this.setState({ otpNumber })
+          })
+      }
 
     handleChange = (event) => {
         const { emailId, password } = this.props;
@@ -85,16 +134,27 @@ export class LoginOtpVerify extends React.Component {
         }
         console.log('getCookie', Cookies.get('LoginUser'));
     };
+    handleSubmitForm=(values) =>{
+        const otp = parseInt("" + values.comPhoneText1 + values.comPhoneText2 + 
+        values.comPhoneText3+values.comPhoneText4 + values.comPhoneText5 +  values.comPhoneText6);
+        var myotpNumber = this.state.otpNumber;
+        //console.log(myotpNumber);
+        if (otp === myotpNumber) {
+        this.setState({ otpError:false });
+          return history.push('./home');
+        }
+        this.setState({ otpError:true });
+      };
 
     render() {
         const { handleSubmit } = this.props;
-        const handleSubmitForm = (values) => {
-            console.log('values', values);
-            history.push('./home');
-        };
+        // const handleSubmitForm = (values) => {
+        //     console.log('values', values);
+        //     history.push('./home');
+        // };
         return (
             <div className="formWrap">
-                <form onSubmit={handleSubmit(handleSubmitForm)}>
+                <form onSubmit={handleSubmit(this.handleSubmitForm)}>
                     <Row>
                         <Col sm={12} lg={12}>
                                Enter the confirmation code that was sent to your phone at
@@ -109,6 +169,7 @@ Remember this device (not recommended for public or shared devices).
                             </ControlLabel>
                         </Col >
                     </Row>
+                    {this.state.otpError ? 'VerifyOtp':''}
                     <Row>
                         <Row className="phonenumber">
                             <Col
@@ -223,6 +284,7 @@ If you did not receive a code, wait a few minutes and request a new one.
 
 const LoginOtpVerifyForm = reduxForm({
     form: 'login',
+    validate,
     destroyOnUnmount: false,
     forceUnregisterOnUnmount: true,
 })(LoginOtpVerify);

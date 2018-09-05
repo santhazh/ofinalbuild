@@ -30,6 +30,21 @@ class Login extends React.Component {
   closeModel = () => {
       history.push('./home');
   }
+  AuthenticationRequired=(values) =>{
+    const isAuthenticationRequired = values.isAuthenticationRequired;
+    if (isAuthenticationRequired) {
+      return this.nextPage();
+    }
+    return history.push('./home');
+  }
+
+//   otpRequired=(values) =>{
+//     const otp = values.one + values.two +  values.three....;
+//     if (otp = 123456) {
+//       return history.push('./home');
+//     }
+//     return invalidotp;
+//   }
 
   render() {
       const { currentStep } = this.state;
@@ -38,7 +53,8 @@ class Login extends React.Component {
               {currentStep.id === 0
                 && (
                     <LoginPage
-                        onSubmit={this.nextPage}/>
+                        onSubmit = {this.AuthenticationRequired}
+                        />
                 )}
               {currentStep.id === 1
                 && (

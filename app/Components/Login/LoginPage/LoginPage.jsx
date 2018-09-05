@@ -63,6 +63,16 @@ export class LoginPage extends React.Component {
         };
     }
 
+    handleChange = (event) => {
+        const { emailId, password } = this.props;
+        if (event.target.checked) {
+            Cookies.set('LoginUser', { email: emailId, password });
+        } else {
+            Cookies.remove('LoginUser');
+        }
+        console.log('getCookie', Cookies.get('LoginUser'));
+    };
+
     componentDidMount() {
         document.addEventListener('keydown', this.escFunction, false);
     }
@@ -79,7 +89,6 @@ export class LoginPage extends React.Component {
 
     render() {
         const { handleSubmit } = this.props;
-
         return (
 
             <div className="formWrap">
@@ -99,7 +108,10 @@ export class LoginPage extends React.Component {
                     <div className="form-group">
                         <p>secure your Oprofessional account with two-step authentication</p>
                         <ControlLabel>
-                            <input type="checkbox" />
+                        <Field name="isAuthenticationRequired"  
+                        type="checkbox"
+                        component={renderField}
+                        label="isAuthenticationRequired"/>
                             {' '}
                             Verify my account with two-step authentication
                         </ControlLabel>
